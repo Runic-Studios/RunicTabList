@@ -15,10 +15,15 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        name = "dmulloy2"
+        url = "https://repo.dmulloy2.net/repository/public/"
+    }
 }
 
 dependencies {
-compileOnly "com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT"
+    compileOnly "com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT"
+    compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0'
 }
 
 def targetJavaVersion = 8
