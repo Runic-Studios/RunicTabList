@@ -1,0 +1,4 @@
+name: RunicTabList
+version: '${version}'
+main: com.runicrealms.runictablist.RunicTabList
+api-version: 1.16
