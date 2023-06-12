@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:24.0.0'
-    compileOnly "com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT"
+    compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
     compileOnly 'com.comphenix.protocol:ProtocolLib:5.0.0'
 }
 
