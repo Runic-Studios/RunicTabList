@@ -2,15 +2,14 @@ package com.runicrealms.runictablist.tab;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.PlayerInfoData;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.runicrealms.runictablist.RunicTabList;
+import com.runicrealms.runictablist.util.PacketUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -103,38 +102,32 @@ public class TabList {
             throw new IllegalStateException("The elements size is too large! It must be less than or equal to " + TabList.MAXIMUM_ITEMS);
         }
 
-        PacketContainer headerAndFooter = new PacketContainer(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
-        headerAndFooter.getChatComponents().write(0, WrappedChatComponent.fromText(this.header == null ? "" : this.header));
-        headerAndFooter.getChatComponents().write(1, WrappedChatComponent.fromText(this.footer == null ? "" : this.footer));
+        Bukkit.getScheduler().runTaskAsynchronously(RunicTabList.getInstance(), () -> {
+            if (this.pastUpdate == null) {
+                PacketContainer wipe = PacketUtil.getRemovePacket(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).toList());
+                PacketUtil.send(this.player, wipe);
+            }
 
-        /*
-        //If just removing all of it and readding is heavy we can do this, harder to maintain
-        List<UUID> remove = this.pastUpdate != null ? this.pastUpdate.stream().filter(element -> !this.elements.contains(element)).map(TabElement::getUUID).collect(Collectors.toList()) : null;
+            PacketContainer headerAndFooter = PacketUtil.getHeaderAndFooterPacket(this.header, this.footer);
 
-        PacketContainer removePlayers = remove != null && !remove.isEmpty() ? new PacketContainer(PacketType.Play.Server.PLAYER_INFO_REMOVE) : null;
-        if (removePlayers != null) {
-            removePlayers.getIntegers().write(0, remove.size());
-            removePlayers.getUUIDLists().write(1, remove);
-        }
-         */
-        PacketContainer removePlayers = this.pastUpdate != null ? new PacketContainer(PacketType.Play.Server.PLAYER_INFO_REMOVE) : null;
-        if (removePlayers != null) {
-            removePlayers.getIntegers().write(0, this.pastUpdate.size());
-            removePlayers.getUUIDLists().write(0, this.pastUpdate); //maybe field index of 1?
-        }
+            PacketContainer removePlayers = this.pastUpdate != null ? new PacketContainer(PacketType.Play.Server.PLAYER_INFO_REMOVE) : null;
+            if (removePlayers != null) {
+                removePlayers.getUUIDLists().write(0, this.pastUpdate);
+            }
 
-        PacketContainer addPlayers = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
-        addPlayers.getPlayerInfoActions().write(0, EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER));
-        addPlayers.getPlayerInfoDataLists().write(0, this.elements.stream().map(element -> new PlayerInfoData(element.getProfile(), element.getPing().getBars(), EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(element.getText()))).toList()); //maybe fieldIndex of 1?
+            PacketContainer addPlayers = PacketUtil.getAddPacket(this.elements.stream().map(TabElement::getInfo).toList());
 
-        if (this.pastUpdate == null) {
-            this.pastUpdate = new ArrayList<>();
-        }
+            if (this.pastUpdate == null) {
+                this.pastUpdate = new ArrayList<>();
+            }
 
-        this.pastUpdate.clear();
-        Iterator<UUID> iterator = this.elements.stream().map(TabElement::getUUID).iterator();
-        while (iterator.hasNext()) {
-            this.pastUpdate.add(iterator.next());
-        }
+            this.pastUpdate.clear();
+            Iterator<UUID> iterator = this.elements.stream().map(TabElement::getUUID).iterator();
+            while (iterator.hasNext()) {
+                this.pastUpdate.add(iterator.next());
+            }
+
+            PacketUtil.send(this.player, headerAndFooter, removePlayers, addPlayers);
+        });
     }
 }
