@@ -1,23 +1,19 @@
 package com.runicrealms.runictablist;
 
-import com.runicrealms.runictablist.tab.TabElement;
-import com.runicrealms.runictablist.tab.TabList;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class RunicTabList extends JavaPlugin {
     private static RunicTabList plugin;
 
     /*
     TODO:
-    - fix default skins
     - find way to order tab list (order in sent list is not maintained on client)
+    - DO NOT REMOVE REAL PLAYERS FROM TAB LIST EVERRRRRRRR
      */
 
     @Override
@@ -50,19 +46,21 @@ public final class RunicTabList extends JavaPlugin {
      * TESTING ONLY PLEASE DO NOT GET MAD AT ME xD
      */
     private static class Listener implements org.bukkit.event.Listener {
-        @EventHandler
+        @EventHandler(priority = EventPriority.MONITOR)
         private void onPlayerJoin(PlayerJoinEvent event) {
+            /*
             List<TabElement> elements = new ArrayList<>();
             TabList tab = new TabList(event.getPlayer(), elements, null, null);
-            tab.setHeader("0");
-            tab.update();
+            tab.setHeader("    0    ");
 
             Bukkit.getScheduler().runTaskTimerAsynchronously(RunicTabList.getInstance(), () -> {
-                String text = String.valueOf(Integer.parseInt(tab.getHeader()) + 1);
+                String text = "    " + (Integer.parseInt(tab.getHeader().trim()) + 1) + "    ";
                 tab.setHeader(text);
-                elements.add(new TabElement(text, TabElement.Ping.BAD, TabElement.Skin.BLANK));
+                elements.add(new TabElement(text, TabElement.Ping.VERY_BAD, TabElement.Skin.YELLOW));
                 tab.update();
-            }, 40, 100);
+            }, 100, 100);
+
+             */
         }
     }
 }

@@ -11,9 +11,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -50,9 +49,9 @@ public final class PacketUtil {
      * @return the packet
      */
     @NotNull
-    public static PacketContainer getAddPacket(@NotNull List<PlayerInfoData> elements) {
+    public static PacketContainer getAddPacket(@NotNull List<PlayerInfoData> elements, @NotNull EnumWrappers.PlayerInfoAction... actions) {
         PacketContainer add = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
-        add.getPlayerInfoActions().write(0, EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER, EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME, EnumWrappers.PlayerInfoAction.UPDATE_LATENCY, EnumWrappers.PlayerInfoAction.UPDATE_LISTED));
+        add.getPlayerInfoActions().write(0, Set.of(actions));
         add.getPlayerInfoDataLists().write(1, elements);
         return add;
     }
@@ -64,14 +63,13 @@ public final class PacketUtil {
      * @return the packet
      */
     @NotNull
-    public static PacketContainer getAddPacket(@NotNull TabElement... elements) {
-        List<PlayerInfoData> data = new ArrayList<>();
-
-        for (TabElement element : elements) {
-            data.add(element.getInfo());
-        }
-
-        return PacketUtil.getAddPacket(data);
+    public static PacketContainer getAddPacket(@NotNull List<PlayerInfoData> elements) {
+        return PacketUtil.getAddPacket(elements, EnumWrappers.PlayerInfoAction.ADD_PLAYER,
+                EnumWrappers.PlayerInfoAction.INITIALIZE_CHAT,
+                EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE,
+                EnumWrappers.PlayerInfoAction.UPDATE_LISTED,
+                EnumWrappers.PlayerInfoAction.UPDATE_LATENCY,
+                EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME);
     }
 
     /**
