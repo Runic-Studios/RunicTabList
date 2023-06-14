@@ -1,8 +1,5 @@
 package com.runicrealms.runictablist.tab;
 
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.PlayerInfoData;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.runicrealms.runictablist.util.TextUtil;
@@ -10,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * A class that represents an element in a {@link TabList}
@@ -85,24 +81,6 @@ public class TabElement {
         this.skin = skin;
     }
 
-    /**
-     * A method that builds a profile for a {@link TabElement}
-     * Method stolen from <a href="https://github.com/thekeenant/tabbed/blob/78cc6d22e7bf1abb6a3f6e1a9bf7af876da40144/core/src/main/java/com/keenant/tabbed/tablist/SimpleTabList.java#LL297C32-L297C46">...</a>
-     *
-     * @param index the index the element is meant to be
-     * @return the player data
-     */
-    @NotNull
-    public PlayerInfoData build(int index) {
-        String name = String.format("%03d", index) + "|UpdateMC";
-        UUID uuid = UUID.nameUUIDFromBytes(name.getBytes());
-
-        WrappedGameProfile profile = new WrappedGameProfile(uuid, name);
-        profile.getProperties().put("textures", new WrappedSignedProperty("textures", this.skin.getValue(), this.skin.getSignature()));
-
-        return new PlayerInfoData(profile, this.ping.getLatency(), EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(this.text));
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof TabElement element)) {
@@ -110,6 +88,27 @@ public class TabElement {
         }
 
         return this.text.equals(element.getText()) && this.ping.equals(element.getPing()) && this.skin.equals(element.getSkin());
+    }
+
+    /**
+     * A method that builds a tab element based on the player
+     *
+     * @param player the player to build
+     * @param text   the text that should replace the player name
+     * @return the tab element
+     */
+    @NotNull
+    public static TabElement fromPlayer(@NotNull Player player, @NotNull String text) {
+        WrappedGameProfile profile = WrappedGameProfile.fromPlayer(player);
+        Optional<WrappedSignedProperty> textures = profile.getProperties().get("textures").stream().findAny();
+
+        if (!textures.isPresent()) {
+            throw new IllegalStateException("No textures exist on " + player.getName());
+        }
+
+        WrappedSignedProperty texture = textures.get();
+
+        return new TabElement(text, Ping.getPing(player), new Skin(texture.getValue(), texture.getSignature()));
     }
 
     /**

@@ -2,6 +2,10 @@ package com.runicrealms.runictablist.tab;
 
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.runicrealms.runictablist.RunicTabList;
 import com.runicrealms.runictablist.util.PacketUtil;
 import org.bukkit.Bukkit;
@@ -10,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * A class that represents a tab list sent to a player
@@ -102,14 +107,31 @@ public class TabList {
             PacketContainer headerAndFooter = PacketUtil.getHeaderAndFooterPacket(this.header, this.footer);
 
             PacketContainer removeIcons = PacketUtil.getRemovePacket(); //all of the special bells and whistle data
+            //REMOVE ALL 80
 
             PacketContainer addIcons = PacketUtil.getAddPacket(null); //all the icons that need to be added
+            //ADD ALL 80
 
-            PacketContainer modifyPlayers = PacketUtil.getAddPacket(null,
-                    EnumWrappers.PlayerInfoAction.UPDATE_LISTED,
-                    EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME); //all the players that need to have their positions altered
-
-            PacketUtil.send(this.player, headerAndFooter, removeIcons, addIcons, modifyPlayers);
+            PacketUtil.send(this.player, headerAndFooter, removeIcons, addIcons);
         });
+    }
+
+    /**
+     * A method that builds a profile for a {@link TabElement}
+     * Method stolen from <a href="https://github.com/thekeenant/tabbed/blob/78cc6d22e7bf1abb6a3f6e1a9bf7af876da40144/core/src/main/java/com/keenant/tabbed/tablist/SimpleTabList.java#LL297C32-L297C46">...</a>
+     *
+     * @param element the element to build data for
+     * @param index   the index the element is meant to be
+     * @return the player data
+     */
+    @NotNull
+    private PlayerInfoData build(@NotNull TabElement element, int index) {
+        String name = String.format("%03d", index) + "|UpdateMC";
+        UUID uuid = UUID.nameUUIDFromBytes(name.getBytes());
+
+        WrappedGameProfile profile = new WrappedGameProfile(uuid, name);
+        profile.getProperties().put("textures", new WrappedSignedProperty("textures", element.getSkin().getValue(), element.getSkin().getSignature()));
+
+        return new PlayerInfoData(profile, element.getPing().getLatency(), EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(element.getText()));
     }
 }

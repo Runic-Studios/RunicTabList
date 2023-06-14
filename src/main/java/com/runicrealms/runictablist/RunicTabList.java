@@ -12,7 +12,7 @@ public final class RunicTabList extends JavaPlugin {
 
     /*
     TODO:
-    - find way to order tab list (order in sent list is not maintained on client)
+    - test a full tab list of fake players, if it just hides the real players we are in buisness
     - DO NOT REMOVE REAL PLAYERS FROM TAB LIST EVERRRRRRRR
      */
 
