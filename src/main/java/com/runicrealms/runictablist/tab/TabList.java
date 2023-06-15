@@ -29,9 +29,11 @@ import java.util.stream.IntStream;
 public class TabList {
     private final Player player;
     private final Map<Integer, TabElement> elements;
-    private final Map<Integer, TabElement> clientIcons;
+    private final Map<Integer, TabElement> clientElements;
     private String header;
     private String footer;
+    private String clientHeader;
+    private String clientFooter;
 
     public static final int MAXIMUM_ITEMS = 4 * 20; //client maximum is 4x20 (4 columns, 20 rows)
     private static final List<PlayerInfoData> BLANKS = IntStream.range(0, TabList.MAXIMUM_ITEMS).mapToObj(i -> TabList.build(TabElement.BLANK, i)).collect(Collectors.toUnmodifiableList());
@@ -39,9 +41,11 @@ public class TabList {
     public TabList(@NotNull Player player, @Nullable String header, @Nullable String footer) {
         this.player = player;
         this.elements = new HashMap<>();
-        this.clientIcons = new HashMap<>();
+        this.clientElements = new HashMap<>();
         this.header = header;
         this.footer = footer;
+        this.clientHeader = null;
+        this.clientFooter = null;
     }
 
     /**
@@ -120,10 +124,23 @@ public class TabList {
      */
     public void update() {
         Bukkit.getScheduler().runTaskAsynchronously(RunicTabList.getInstance(), () -> {
-            PacketContainer headerAndFooter = PacketUtil.getHeaderAndFooterPacket(this.header, this.footer);
+            boolean differentHeaderNullability = ((this.header == null) != (this.clientHeader == null));
+            boolean differentFooterNullability = ((this.footer == null) != (this.clientFooter == null));
 
-            if (this.elements.equals(this.clientIcons) && !this.clientIcons.isEmpty()) {
-                PacketUtil.send(this.player, headerAndFooter);
+            //the this.header == null and this.footer == null check the IDE says is unnecessary, but it is used to stop null pointers
+            boolean differentHeaderValue = !differentHeaderNullability && (this.header == null || !this.header.equals(this.clientHeader));
+            boolean differentFooterValue = !differentFooterNullability && (this.footer == null || !this.footer.equals(this.clientFooter));
+
+            boolean updateHeaderAndFooter = differentHeaderNullability || differentFooterNullability || differentHeaderValue || differentFooterValue;
+
+            PacketContainer headerAndFooter = updateHeaderAndFooter ? PacketUtil.getHeaderAndFooterPacket(this.header, this.footer) : null;
+            if (headerAndFooter != null) {
+                this.clientHeader = this.header;
+                this.clientFooter = this.footer;
+            }
+
+            if (this.elements.equals(this.clientElements) && !this.clientElements.isEmpty()) {
+                PacketUtil.send(this.player, headerAndFooter); //wont do anything if null
                 return;
             }
 
@@ -134,10 +151,10 @@ public class TabList {
 
             for (int i = 0; i < TabList.MAXIMUM_ITEMS; i++) {
                 TabElement push = this.elements.get(i);
-                TabElement current = this.clientIcons.get(i);
+                TabElement current = this.clientElements.get(i);
 
                 //if something does not exist for the first time, add a blank
-                if (push == null && current == null && this.clientIcons.isEmpty()) {
+                if (push == null && current == null && this.clientElements.isEmpty()) {
                     newPlayers.add(TabList.BLANKS.get(i));
                     continue;
                 }
@@ -186,16 +203,25 @@ public class TabList {
                 }
             }
 
-            PacketContainer removeIcons = !this.clientIcons.isEmpty() ? PacketUtil.getRemovePacket(removePlayers) : null;
+            PacketContainer removeIcons = !this.clientElements.isEmpty() ? PacketUtil.getRemovePacket(removePlayers) : null;
             PacketContainer addIcons = PacketUtil.getAddPacket(newPlayers);
             PacketContainer updateNames = !updateName.isEmpty() ? PacketUtil.getAddPacket(updateName, EnumSet.of(EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME)) : null;
             PacketContainer updatePings = !updatePing.isEmpty() ? PacketUtil.getAddPacket(updatePing, EnumSet.of(EnumWrappers.PlayerInfoAction.UPDATE_LATENCY)) : null;
 
             PacketUtil.send(this.player, headerAndFooter, removeIcons, addIcons, updateNames, updatePings);
 
-            this.clientIcons.clear();
-            this.clientIcons.putAll(this.elements);
+            this.clientElements.clear();
+            this.clientElements.putAll(this.elements);
         });
+    }
+
+    /**
+     * A method used to remove all the fake player data from the client sent by this tab list
+     */
+    public void reset() {
+        List<UUID> ids = TabList.BLANKS.stream().map(PlayerInfoData::getProfileId).toList(); //all UUIDS are the same
+
+        PacketUtil.send(this.player, PacketUtil.getRemovePacket(ids), PacketUtil.getHeaderAndFooterPacket(null, null));
     }
 
     /**
