@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -19,6 +20,11 @@ import java.util.UUID;
  * A utility function to manage packets
  */
 public final class PacketUtil {
+    private static final EnumSet<EnumWrappers.PlayerInfoAction> ACTIONS = EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER,
+            EnumWrappers.PlayerInfoAction.UPDATE_LISTED,
+            EnumWrappers.PlayerInfoAction.UPDATE_LATENCY,
+            EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME);
+
     /**
      * Private constructor to prevent class being used in an OOP way
      */
@@ -49,9 +55,9 @@ public final class PacketUtil {
      * @return the packet
      */
     @NotNull
-    public static PacketContainer getAddPacket(@NotNull List<PlayerInfoData> elements, @NotNull EnumWrappers.PlayerInfoAction... actions) {
+    public static PacketContainer getAddPacket(@NotNull List<PlayerInfoData> elements, @NotNull Set<EnumWrappers.PlayerInfoAction> actions) {
         PacketContainer add = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
-        add.getPlayerInfoActions().write(0, Set.of(actions));
+        add.getPlayerInfoActions().write(0, actions);
         add.getPlayerInfoDataLists().write(1, elements);
         return add;
     }
@@ -64,12 +70,7 @@ public final class PacketUtil {
      */
     @NotNull
     public static PacketContainer getAddPacket(@NotNull List<PlayerInfoData> elements) {
-        return PacketUtil.getAddPacket(elements, EnumWrappers.PlayerInfoAction.ADD_PLAYER,
-                EnumWrappers.PlayerInfoAction.INITIALIZE_CHAT,
-                EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE,
-                EnumWrappers.PlayerInfoAction.UPDATE_LISTED,
-                EnumWrappers.PlayerInfoAction.UPDATE_LATENCY,
-                EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME);
+        return PacketUtil.getAddPacket(elements, PacketUtil.ACTIONS);
     }
 
     /**
@@ -83,17 +84,6 @@ public final class PacketUtil {
         PacketContainer remove = new PacketContainer(PacketType.Play.Server.PLAYER_INFO_REMOVE);
         remove.getUUIDLists().write(0, uuids);
         return remove;
-    }
-
-    /**
-     * A quick way to build a remove player packet
-     *
-     * @param uuids the uuids of players to remove
-     * @return the packet
-     */
-    @NotNull
-    public static PacketContainer getRemovePacket(@NotNull UUID... uuids) {
-        return PacketUtil.getRemovePacket(List.of(uuids));
     }
 
     /**

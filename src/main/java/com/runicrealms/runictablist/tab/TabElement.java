@@ -5,6 +5,7 @@ import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.runicrealms.runictablist.util.TextUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -18,7 +19,9 @@ public class TabElement {
     private Ping ping;
     private Skin skin;
 
-    public TabElement(@NotNull String text, @NotNull Ping ping, @NotNull Skin skin) {
+    public static final TabElement BLANK = new TabElement("", Ping.VERY_BAD, Skin.BLANK);
+
+    public TabElement(@NotNull String text, @NotNull Ping ping, @Nullable Skin skin) {
         this.text = TextUtil.format(text);
         this.ping = ping;
         this.skin = skin;
@@ -30,7 +33,7 @@ public class TabElement {
      * @return the text that will be displayed in this element
      */
     @NotNull
-    public final String getText() {
+    public String getText() {
         return this.text;
     }
 
@@ -39,7 +42,7 @@ public class TabElement {
      *
      * @param text the text that will be displayed in this element
      */
-    public final void setText(@NotNull String text) {
+    public void setText(@NotNull String text) {
         this.text = TextUtil.format(text);
     }
 
@@ -49,7 +52,7 @@ public class TabElement {
      * @return the ping that will be displayed in this element
      */
     @NotNull
-    public final Ping getPing() {
+    public Ping getPing() {
         return this.ping;
     }
 
@@ -58,7 +61,7 @@ public class TabElement {
      *
      * @param ping the ping that will be displayed in this element
      */
-    public final void setPing(@NotNull Ping ping) {
+    public void setPing(@NotNull Ping ping) {
         this.ping = ping;
     }
 
@@ -67,8 +70,8 @@ public class TabElement {
      *
      * @return the base64 encoded string of the textures json that will be displayed in this element
      */
-    @NotNull
-    public final Skin getSkin() {
+    @Nullable
+    public Skin getSkin() {
         return this.skin;
     }
 
@@ -77,7 +80,7 @@ public class TabElement {
      *
      * @param skin the base64 encoded string of the textures json that will be displayed in this element
      */
-    public final void setSkin(@NotNull Skin skin) {
+    public void setSkin(@Nullable Skin skin) {
         this.skin = skin;
     }
 
@@ -99,43 +102,23 @@ public class TabElement {
      */
     @NotNull
     public static TabElement fromPlayer(@NotNull Player player, @NotNull String text) {
-        WrappedGameProfile profile = WrappedGameProfile.fromPlayer(player);
-        Optional<WrappedSignedProperty> textures = profile.getProperties().get("textures").stream().findAny();
-
-        if (!textures.isPresent()) {
-            throw new IllegalStateException("No textures exist on " + player.getName());
-        }
-
-        WrappedSignedProperty texture = textures.get();
-
-        return new TabElement(text, Ping.getPing(player), new Skin(texture.getValue(), texture.getSignature()));
+        return new TabElement(text, Ping.fromPlayer(player), Skin.fromPlayer(player));
     }
 
     /**
      * An enum which represents the ping a {@link TabElement} can have
      */
     public enum Ping {
-        PERFECT(5, 0),
-        GOOD(4, 150),
-        OK(3, 300),
-        BAD(2, 600),
-        VERY_BAD(1, 1000);
+        PERFECT(0),
+        GOOD(150),
+        OK(300),
+        BAD(600),
+        VERY_BAD(1000);
 
-        private final int bars;
         private final int latency;
 
-        Ping(int bars, int latency) {
-            this.bars = bars;
+        Ping(int latency) {
             this.latency = latency;
-        }
-
-        /**
-         * A method used to get the amount of bars this connection has
-         *
-         * @return the amount of bars this connection has
-         */
-        public int getBars() {
-            return this.bars;
         }
 
         /**
@@ -151,24 +134,33 @@ public class TabElement {
          * A method used to get the corresponding ping icon based on packet delay in milliseconds
          * ChatGPT said this was the same conditions that vanilla used so who am I to judge?
          *
-         * @param player the player to check the connection of
+         * @param latency the latency of the packets
          * @return the corresponding ping icon based on packet delay in milliseconds
          */
         @NotNull
-        public static Ping getPing(@NotNull Player player) {
-            int ping = player.getPing();
-
-            if (ping < 150) {
+        public static Ping fromLatency(int latency) {
+            if (latency < 150) {
                 return Ping.PERFECT;
-            } else if (ping < 300) {
+            } else if (latency < 300) {
                 return Ping.GOOD;
-            } else if (ping < 600) {
+            } else if (latency < 600) {
                 return Ping.OK;
-            } else if (ping < 1000) {
+            } else if (latency < 1000) {
                 return Ping.BAD;
             } else {
                 return Ping.VERY_BAD;
             }
+        }
+
+        /**
+         * A method used to get the corresponding ping icon based on packet delay in milliseconds
+         *
+         * @param player the player to check the connection of
+         * @return the corresponding ping icon based on packet delay in milliseconds
+         */
+        @NotNull
+        public static Ping fromPlayer(@NotNull Player player) {
+            return Ping.fromLatency(player.getPing());
         }
     }
 
@@ -222,21 +214,31 @@ public class TabElement {
         /**
          * A method used to get the skin of the provided player
          *
-         * @param player the player
+         * @param profile the profile
          * @return their skin
          */
-        @NotNull
-        public static Skin getSkin(@NotNull Player player) {
-            WrappedGameProfile profile = WrappedGameProfile.fromPlayer(player);
+        @Nullable
+        public static Skin fromProfile(@NotNull WrappedGameProfile profile) {
             Optional<WrappedSignedProperty> textures = profile.getProperties().get("textures").stream().findAny();
 
             if (!textures.isPresent()) {
-                throw new IllegalStateException("No textures exist on " + player.getName());
+                return null;
             }
 
             WrappedSignedProperty texture = textures.get();
 
             return new Skin(texture.getValue(), texture.getSignature());
+        }
+
+        /**
+         * A method used to get the skin of the provided player
+         *
+         * @param player the player
+         * @return their skin
+         */
+        @Nullable
+        public static Skin fromPlayer(@NotNull Player player) {
+            return Skin.fromProfile(WrappedGameProfile.fromPlayer(player));
         }
     }
 }
