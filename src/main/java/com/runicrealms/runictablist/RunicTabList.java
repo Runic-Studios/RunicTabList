@@ -10,7 +10,6 @@ public final class RunicTabList extends JavaPlugin {
 
     /*
     TODO:
-    - Add row and column implementation
      */
 
     @Override
