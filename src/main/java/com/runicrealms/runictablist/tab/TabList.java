@@ -136,20 +136,14 @@ public class TabList {
                 TabElement push = this.elements.get(i);
                 TabElement current = this.clientIcons.get(i);
 
-                if (i == 0) Bukkit.broadcastMessage("---------------------");
-                if (i == 0)
-                    Bukkit.broadcastMessage(push == null ? "false" : String.valueOf(push.getSkin().equals(TabElement.Skin.GOLD)));
-
                 //if something does not exist for the first time, add a blank
                 if (push == null && current == null && this.clientIcons.isEmpty()) {
                     newPlayers.add(TabList.BLANKS.get(i));
-                    if (i == 0) Bukkit.broadcastMessage("1"); //REMOVE
                     continue;
                 }
 
                 //if something exists but both are blank, the client already knows this, do nothing
                 if (push == null && current == null) {
-                    if (i == 0) Bukkit.broadcastMessage("2");
                     continue;
                 }
 
@@ -157,7 +151,6 @@ public class TabList {
                 if (push == null) {
                     removePlayers.add(UUID.nameUUIDFromBytes(TabList.getFakeName(i).getBytes()));
                     newPlayers.add(TabList.BLANKS.get(i));
-                    if (i == 0) Bukkit.broadcastMessage("3");
                     continue;
                 }
 
@@ -165,15 +158,11 @@ public class TabList {
                 if (current == null) {
                     removePlayers.add(UUID.nameUUIDFromBytes(TabList.getFakeName(i).getBytes()));
                     newPlayers.add(TabList.build(push, i));
-                    if (i == 0) {
-                        Bukkit.broadcastMessage("4");
-                    }
                     continue;
                 }
 
                 //if they are both not null, and both the same that means the client already knows this, do nothing
                 if (push.equals(current)) { //push != null && current != null always true
-                    if (i == 0) Bukkit.broadcastMessage("5");
                     continue;
                 }
 
@@ -183,19 +172,16 @@ public class TabList {
                 if ((push.getSkin() == null) != (current.getSkin() == null) || !push.getSkin().equals(current.getSkin())) {
                     removePlayers.add(UUID.nameUUIDFromBytes(TabList.getFakeName(i).getBytes()));
                     newPlayers.add(data);
-                    if (i == 0) Bukkit.broadcastMessage("6");
                     continue; //this process covers all the bases so the next two are just not necessary
                 }
 
                 //if the text is not the same, update text
                 if (!push.getText().equals(current.getText())) {
-                    if (i == 0) Bukkit.broadcastMessage("7");
                     updateName.add(data);
                 }
 
                 //if ping is not the same, update ping
                 if (push.getPing() != current.getPing()) {
-                    if (i == 0) Bukkit.broadcastMessage("8");
                     updatePing.add(data);
                 }
             }
