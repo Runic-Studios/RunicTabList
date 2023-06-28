@@ -1,9 +1,11 @@
-name: RunicTabList
+name: RunicRealmsTabList
 version: '${version}'
-main: com.runicrealms.runictablist.RunicTabList
+main: com.runicrealms.runictablist.RunicRealmsTabList
 api-version: 1.19
 depend:
   - ProtocolLib
   - RunicCommon
+  - RunicDatabase
   - RunicCore
   - RunicGuilds
+  - LuckPerms

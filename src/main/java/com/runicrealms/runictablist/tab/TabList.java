@@ -82,6 +82,29 @@ public class TabList {
     }
 
     /**
+     * A method used to set an element in a tab list using columns and rows instead of an index
+     *
+     * @param element the element to be set
+     * @param column  the column index
+     * @param row     the row index
+     */
+    public void set(@NotNull TabElement element, int column, int row) {
+        //no need for conditions, the next call to set already takes care of that
+        this.set(element, this.getIndex(column, row));
+    }
+
+    /**
+     * A method used to remove an element in a tab list using columns and rows instead of an index
+     *
+     * @param column the column index
+     * @param row    the row index
+     */
+    public void remove(int column, int row) {
+        //no need for conditions, the HashMap implementation of Map in the superclass takes care of that
+        this.remove(this.getIndex(column, row));
+    }
+
+    /**
      * A method used to get the header of this tab list
      *
      * @return the header of this tab list (null if no header should exist)
@@ -254,5 +277,16 @@ public class TabList {
     @NotNull
     private static String getFakeName(int index) {
         return String.format("%03d", index) + "|UpdateMC";
+    }
+
+    /**
+     * A method that does some quick math to convert rows and columns to an index
+     *
+     * @param column the column
+     * @param row    the row
+     * @return the index of the intended element
+     */
+    private int getIndex(int column, int row) {
+        return (column * 20) + row; //there are 20 rows per column
     }
 }
