@@ -6,7 +6,9 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.runicrealms.runictablist.RunicTabList;
 import com.runicrealms.runictablist.tab.TabElement;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +27,9 @@ public final class PacketUtil {
             EnumWrappers.PlayerInfoAction.UPDATE_LATENCY,
             EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME);
 
+
+    //private static final EnumSet<EnumWrappers.PlayerInfoAction> ACTIONS = EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER, EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME, EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE, EnumWrappers.PlayerInfoAction.UPDATE_LATENCY, EnumWrappers.PlayerInfoAction.UPDATE_LISTED);
+
     /**
      * Private constructor to prevent class being used in an OOP way
      */
@@ -39,13 +44,15 @@ public final class PacketUtil {
      * @param packets the packets to send
      */
     public static void send(@NotNull Player player, @Nullable PacketContainer... packets) {
-        for (PacketContainer packet : packets) {
-            if (packet == null) {
-                continue;
-            }
+        Bukkit.getScheduler().runTask(RunicTabList.getInstance(), () -> {
+            for (PacketContainer packet : packets) {
+                if (packet == null) {
+                    continue;
+                }
 
-            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, false);
-        }
+                ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, false);
+            }
+        });
     }
 
     /**

@@ -1,6 +1,6 @@
-name: RunicRealmsTabList
+name: RunicTabList
 version: '${version}'
-main: com.runicrealms.runictablist.RunicRealmsTabList
+main: com.runicrealms.runictablist.RunicTabList
 api-version: 1.19
 depend:
   - ProtocolLib

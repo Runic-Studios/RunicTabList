@@ -5,6 +5,7 @@ import com.runicrealms.plugin.api.event.PlayerVanishEvent;
 import com.runicrealms.plugin.party.Party;
 import com.runicrealms.plugin.party.event.PartyEvent;
 import com.runicrealms.plugin.party.event.PartyJoinEvent;
+import com.runicrealms.plugin.rdb.event.CharacterSelectEvent;
 import com.runicrealms.runicguilds.RunicGuilds;
 import com.runicrealms.runicguilds.api.event.GuildCreationEvent;
 import com.runicrealms.runicguilds.api.event.GuildDisbandEvent;
@@ -64,7 +65,7 @@ public final class TabListManger implements Listener {
             return;
         }
 
-        RunicCore.getInstance().getServer().getScheduler().runTaskAsynchronously(RunicTabList.getInstance(), tabList::update);
+        tabList.update();
     }
 
     /**
@@ -76,7 +77,7 @@ public final class TabListManger implements Listener {
         RunicRealmsTabList list = this.tabLists.remove(player.getUniqueId());
 
         if (list != null && player.isOnline()) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicTabList.getInstance(), list::reset);
+            Bukkit.getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), list::reset, 1);
         }
     }
 
@@ -85,7 +86,7 @@ public final class TabListManger implements Listener {
      */
     public void refreshAllTabLists() {
         for (RunicRealmsTabList tabList : this.tabLists.values()) {
-            RunicCore.getInstance().getServer().getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), tabList::update, 1);
+            RunicCore.getInstance().getServer().getScheduler().runTaskLater(RunicTabList.getInstance(), tabList::update, 1);
         }
     }
 
@@ -100,6 +101,11 @@ public final class TabListManger implements Listener {
     private void onPlayerQuit(PlayerQuitEvent event) {
         this.removeUser(event.getPlayer());
         refreshAllTabLists();
+    }
+
+    @EventHandler
+    private void onCharacterSelect(CharacterSelectEvent event) {
+        this.update(event.getPlayer());
     }
 
     @EventHandler
