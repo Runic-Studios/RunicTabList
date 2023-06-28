@@ -15,6 +15,8 @@ dependencies {
     compileOnly(commonLibs.paper)
     compileOnly(commonLibs.protocollib)
     compileOnly(project(":Projects:Common"))
+    compileOnly(project(":Projects:Core"))
+    compileOnly(project(":Projects:Guilds"))
 }
 
 java {
