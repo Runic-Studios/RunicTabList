@@ -5,7 +5,8 @@ import com.runicrealms.plugin.api.event.PlayerVanishEvent;
 import com.runicrealms.plugin.party.Party;
 import com.runicrealms.plugin.party.event.PartyEvent;
 import com.runicrealms.plugin.party.event.PartyJoinEvent;
-import com.runicrealms.plugin.rdb.event.CharacterSelectEvent;
+import com.runicrealms.plugin.party.event.PartyLeaveEvent;
+import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
 import com.runicrealms.runicguilds.RunicGuilds;
 import com.runicrealms.runicguilds.api.event.GuildCreationEvent;
 import com.runicrealms.runicguilds.api.event.GuildDisbandEvent;
@@ -45,7 +46,7 @@ public final class TabListManger implements Listener {
         if (!this.tabLists.containsKey(player.getUniqueId())) {
             RunicRealmsTabList tabList = new RunicRealmsTabList(player);
             this.tabLists.put(player.getUniqueId(), tabList);
-            RunicCore.getInstance().getServer().getScheduler().runTaskAsynchronously(RunicTabList.getInstance(), tabList::update);
+            RunicCore.getInstance().getServer().getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), tabList::update, 1);
         }
     }
 
@@ -65,7 +66,7 @@ public final class TabListManger implements Listener {
             return;
         }
 
-        tabList.update();
+        Bukkit.getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), tabList::update, 1);
     }
 
     /**
@@ -85,70 +86,72 @@ public final class TabListManger implements Listener {
      * Refreshes the tablist for all users
      */
     public void refreshAllTabLists() {
-        for (RunicRealmsTabList tabList : this.tabLists.values()) {
-            RunicCore.getInstance().getServer().getScheduler().runTaskLater(RunicTabList.getInstance(), tabList::update, 1);
-        }
+        RunicCore.getInstance().getServer().getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), () -> {
+            for (RunicRealmsTabList tabList : this.tabLists.values()) {
+                tabList.update();
+            }
+        }, 1);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onPlayerJoin(PlayerJoinEvent event) {
         this.addUser(event.getPlayer());
         refreshAllTabLists();
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onPlayerQuit(PlayerQuitEvent event) {
         this.removeUser(event.getPlayer());
         refreshAllTabLists();
     }
 
-    @EventHandler
-    private void onCharacterSelect(CharacterSelectEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onCharacterLoaded(CharacterLoadedEvent event) {
         this.update(event.getPlayer());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onPlayerVanish(PlayerVanishEvent event) {
         refreshAllTabLists();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onParty(PartyEvent event) {
         this.partyUpdate(event.getParty());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onPartyJoin(PartyJoinEvent event) {
         this.partyUpdate(event.getParty());
     }
 
-    @EventHandler
-    private void onPartyLeave(PartyJoinEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onPartyLeave(PartyLeaveEvent event) {
         this.partyUpdate(event.getParty());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildCreate(GuildCreationEvent event) {
         this.update(Bukkit.getPlayer(event.getUuid()));
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildDisband(GuildDisbandEvent event) {
         this.guildUpdate(event.getUUID());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildJoin(GuildInvitationAcceptedEvent event) {
         this.guildUpdate(event.getUUID());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildLeave(GuildMemberLeaveEvent event) {
         this.guildUpdate(event.getUUID());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildKick(GuildMemberKickedEvent event) {
         this.guildUpdate(RunicGuilds.getDataAPI().getGuildInfo(Bukkit.getPlayer(event.getKicker())).getUUID());
         this.update(Bukkit.getPlayer(event.getKicked()));

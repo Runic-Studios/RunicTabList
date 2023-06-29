@@ -6,9 +6,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.runicrealms.runictablist.RunicTabList;
 import com.runicrealms.runictablist.tab.TabElement;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,15 +42,13 @@ public final class PacketUtil {
      * @param packets the packets to send
      */
     public static void send(@NotNull Player player, @Nullable PacketContainer... packets) {
-        Bukkit.getScheduler().runTask(RunicTabList.getInstance(), () -> {
-            for (PacketContainer packet : packets) {
-                if (packet == null) {
-                    continue;
-                }
-
-                ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, false);
+        for (PacketContainer packet : packets) {
+            if (packet == null) {
+                continue;
             }
-        });
+
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, false);
+        }
     }
 
     /**

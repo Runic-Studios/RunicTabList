@@ -224,7 +224,7 @@ public class TabList {
             }
         }
 
-        PacketContainer removeIcons = !this.clientElements.isEmpty() ? PacketUtil.getRemovePacket(removePlayers) : null;
+        PacketContainer removeIcons = PacketUtil.getRemovePacket(removePlayers);
         PacketContainer addIcons = PacketUtil.getAddPacket(newPlayers);
         PacketContainer updateNames = !updateName.isEmpty() ? PacketUtil.getAddPacket(updateName, EnumSet.of(EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME)) : null;
         PacketContainer updatePings = !updatePing.isEmpty() ? PacketUtil.getAddPacket(updatePing, EnumSet.of(EnumWrappers.PlayerInfoAction.UPDATE_LATENCY)) : null;

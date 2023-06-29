@@ -7,7 +7,6 @@ import com.runicrealms.plugin.party.Party;
 import com.runicrealms.plugin.rdb.RunicDatabase;
 import com.runicrealms.runicguilds.RunicGuilds;
 import com.runicrealms.runicguilds.model.GuildInfo;
-import com.runicrealms.runictablist.RunicTabList;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
@@ -57,83 +56,88 @@ public final class RunicRealmsTabList extends TabList {
 
     @Override
     public void update() {
+        Bukkit.broadcastMessage("called tab list update - debug"); //debug only
+
         if (RunicDatabase.getAPI().getCharacterAPI().getCharacterSlot(this.getPlayer().getUniqueId()) == -1) {
             IntStream.range(0, 80).forEach(this::remove);
-            Bukkit.getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), super::update, 1);
+            super.update();
             return;
         }
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), () -> {
-            //make updates here
-            this.set(new TabElement("&e&l  Online [" + Bukkit.getOnlinePlayers().size() + "]", TabElement.Ping.PERFECT, TabElement.Skin.YELLOW), 0);
+        //make updates here
+        this.set(new TabElement("&e&l  Online [" + Bukkit.getOnlinePlayers().size() + "]", TabElement.Ping.PERFECT, TabElement.Skin.YELLOW), 0);
 
-            // Fill column with online players, stop after second column
-            try {
-                Iterator<Pair<? extends Player, String>> iterator = sortPlayersByRank(Bukkit.getOnlinePlayers()).iterator();
-                for (int j = 0; j < 2; j++) {
-                    for (int i = j == 0 ? 1 : 0; i <= 19; i++) {
-                        Pair<? extends Player, String> online = null;
-                        while (iterator.hasNext() && online == null) {
-                            online = iterator.next();
-                            if (RunicCore.getVanishAPI().getVanishedPlayers().contains(online.first)) {
-                                online = null;
-                            }
-                        }
-
-                        if (online != null) {
-                            this.set(TabElement.fromPlayer(online.first, online.second), j, i);
-                        } else {
-                            this.remove(j, i);
+        // Fill column with online players, stop after second column
+        try {
+            Iterator<Pair<? extends Player, String>> iterator = sortPlayersByRank(Bukkit.getOnlinePlayers()).iterator();
+            for (int j = 0; j < 2; j++) {
+                for (int i = j == 0 ? 1 : 0; i < 20; i++) {
+                    Pair<? extends Player, String> online = null;
+                    while (iterator.hasNext() && online == null) {
+                        online = iterator.next();
+                        if (RunicCore.getVanishAPI().getVanishedPlayers().contains(online.first)) {
+                            online = null;
                         }
                     }
+
+                    if (online != null) {
+                        this.set(TabElement.fromPlayer(online.first, online.second), j, i);
+                    } else {
+                        this.remove(j, i);
+                    }
                 }
-            } catch (NullPointerException e) {
-                e.printStackTrace();
             }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
-            Party party = RunicCore.getPartyAPI().getParty(this.getPlayer().getUniqueId());
-            if (party != null) {
-                this.set(new TabElement("&a&l Party [" + party.getSize() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GREEN), 2, 0);
-                int k = 0;
-                for (Pair<? extends Player, String> sortedMember : sortPlayersByRank(party.getMembersWithLeader())) {
-                    if (k > 19) break;
-                    Player member = sortedMember.first;
-                    String memberColoredName = sortedMember.second;
-                    this.set(TabElement.fromPlayer(member, memberColoredName + " " + getHealthChatColor(member) + (int) member.getHealth() + "❤"), 2, k + 1);
-                    k++;
-                }
-            } else {
-                this.set(RunicRealmsTabList.EMPTY_PARTY, 2, 0);
-            }
-
-            this.set(new TabElement("&6&l Guild [0]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD), 3, 0);
-
-            GuildInfo guild = RunicGuilds.getDataAPI().getGuildInfo(this.getPlayer());
-
-            if (guild == null) {
-                super.update();
-                return;
-            }
-
-            Set<UUID> members = guild.getMembersUuids();
-            Set<Player> onlineMembers = members.stream()
-                    .map(Bukkit::getPlayer)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-
-            this.set(new TabElement("&6&l Guild [" + onlineMembers.size() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD), 3, 0);
-
-            int j = 0;
-            for (Pair<? extends Player, String> guildMember : sortPlayersByRank(onlineMembers)) {
-                if (j > 19) {
+        Party party = RunicCore.getPartyAPI().getParty(this.getPlayer().getUniqueId());
+        if (party != null) {
+            this.set(new TabElement("&a&l Party [" + party.getSize() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GREEN), 2, 0);
+            int k = 0;
+            for (Pair<? extends Player, String> sortedMember : sortPlayersByRank(party.getMembersWithLeader())) {
+                if (k > 19) {
                     break;
                 }
 
-                this.set(TabElement.fromPlayer(guildMember.first, guildMember.second), 3, j++);
+                Player member = sortedMember.first;
+                String memberColoredName = sortedMember.second;
+                this.set(TabElement.fromPlayer(member, memberColoredName + " " + getHealthChatColor(member) + (int) member.getHealth() + "❤"), 2, k + 1);
+                k++;
+            }
+        } else {
+            this.set(RunicRealmsTabList.EMPTY_PARTY, 2, 0);
+            IntStream.range(1, 20).forEach(i -> this.remove(2, i));
+        }
+
+        this.set(new TabElement("&6&l Guild [0]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD), 3, 0);
+
+        GuildInfo guild = RunicGuilds.getDataAPI().getGuildInfo(this.getPlayer());
+
+        if (guild == null) {
+            IntStream.range(1, 20).forEach(i -> this.remove(3, i));
+            super.update();
+            return;
+        }
+
+        Set<UUID> members = guild.getMembersUuids();
+        Set<Player> onlineMembers = members.stream()
+                .map(Bukkit::getPlayer)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        this.set(new TabElement("&6&l Guild [" + onlineMembers.size() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD), 3, 0);
+
+        int j = 0;
+        for (Pair<? extends Player, String> guildMember : sortPlayersByRank(onlineMembers)) {
+            if (j > 19) {
+                break;
             }
 
-            super.update();
-        }, 1);
+            this.set(TabElement.fromPlayer(guildMember.first, guildMember.second), 3, j++);
+        }
+
+        super.update();
     }
 
     /**
