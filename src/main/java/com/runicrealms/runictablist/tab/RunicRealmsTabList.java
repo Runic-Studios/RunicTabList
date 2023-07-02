@@ -56,8 +56,6 @@ public final class RunicRealmsTabList extends TabList {
 
     @Override
     public void update() {
-        Bukkit.broadcastMessage("called tab list update - debug"); //debug only
-
         if (RunicDatabase.getAPI().getCharacterAPI().getCharacterSlot(this.getPlayer().getUniqueId()) == -1) {
             IntStream.range(0, 80).forEach(this::remove);
             super.update();

@@ -94,7 +94,7 @@ public final class TabListManger implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    private void onPlayerJoin(PlayerJoinEvent event) {
+    private void onPlayerJoin(CharacterLoadedEvent event) {
         this.addUser(event.getPlayer());
         refreshAllTabLists();
     }
@@ -104,11 +104,6 @@ public final class TabListManger implements Listener {
     private void onPlayerQuit(PlayerQuitEvent event) {
         this.removeUser(event.getPlayer());
         refreshAllTabLists();
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    private void onCharacterLoaded(CharacterLoadedEvent event) {
-        this.update(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
