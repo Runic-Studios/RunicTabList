@@ -20,7 +20,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,8 +53,9 @@ public final class TabListManger implements Listener {
      * A method that updates the tablist for the given player
      *
      * @param player the player to update
+     * @param delay  the delay in ticks before the update packets are sent
      */
-    public void update(@Nullable Player player) {
+    public void update(@Nullable Player player, long delay) {
         if (player == null) {
             return;
         }
@@ -66,7 +66,16 @@ public final class TabListManger implements Listener {
             return;
         }
 
-        Bukkit.getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), tabList::update, 1);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), tabList::update, delay);
+    }
+
+    /**
+     * A method that updates the tablist for the given player
+     *
+     * @param player the player to update
+     */
+    public void update(@Nullable Player player) {
+        this.update(player, 1);
     }
 
     /**
@@ -99,7 +108,6 @@ public final class TabListManger implements Listener {
         refreshAllTabLists();
     }
 
-
     @EventHandler(priority = EventPriority.MONITOR)
     private void onPlayerQuit(PlayerQuitEvent event) {
         this.removeUser(event.getPlayer());
@@ -119,6 +127,7 @@ public final class TabListManger implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onPartyJoin(PartyJoinEvent event) {
         this.partyUpdate(event.getParty());
+        this.update(event.getMember());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -156,11 +165,21 @@ public final class TabListManger implements Listener {
      * A method used to update the tablists of all party members
      *
      * @param party the party to be updated
+     * @param delay the delay in ticks before the update packets are sent
+     */
+    private void partyUpdate(@NotNull Party party, long delay) {
+        for (Player player : party.getMembersWithLeader()) {
+            this.update(player, delay);
+        }
+    }
+
+    /**
+     * A method used to update the tablists of all party members
+     *
+     * @param party the party to be updated
      */
     private void partyUpdate(@NotNull Party party) {
-        for (Player player : party.getMembersWithLeader()) {
-            this.update(player);
-        }
+        this.partyUpdate(party, 1);
     }
 
     /**
