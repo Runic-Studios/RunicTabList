@@ -126,17 +126,19 @@ public final class RunicRealmsTabList extends TabList {
                 .map(Bukkit::getPlayer)
                 .filter(Objects::nonNull)
                 .filter(RunicRealmsTabList::hasSelectedCharacter)
+                .filter(player -> !RunicCore.getVanishAPI().getVanishedPlayers().contains(player))
                 .collect(Collectors.toSet());
 
         this.set(new TabElement("&6&l Guild [" + onlineMembers.size() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD), 3, 0);
 
-        int j = 0;
+        int j = 1;
         for (Pair<? extends Player, String> guildMember : sortPlayersByRank(onlineMembers)) {
             if (j > 19) {
                 break;
             }
 
-            this.set(TabElement.fromPlayer(guildMember.first, guildMember.second), 3, j++);
+            this.set(TabElement.fromPlayer(guildMember.first, guildMember.second), 3, j);
+            j++;
         }
 
         super.update();
