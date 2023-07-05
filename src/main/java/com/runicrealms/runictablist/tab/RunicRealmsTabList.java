@@ -49,9 +49,83 @@ public final class RunicRealmsTabList extends TabList {
 
     public RunicRealmsTabList(@NotNull Player player) {
         super(player, "&d&lRunic Realms\n"
-                        + "&r&a&lPatch 2.0.5 - The Second Age!",
+                        + "&r&a&lPatch 2.1.0 - The Second Age!",
                 "&2Our Website: &awww.runicrealms.com\n"
                         + "&5Our Discord: &5discord.gg/5FjVVd4");
+    }
+
+    /**
+     * A method that returns the color of the user's health in the tab display while in a party
+     *
+     * @param player the user to get health from
+     * @return the color of the user's health in the tab display while in a party
+     */
+    @NotNull
+    private static ChatColor getHealthChatColor(@NotNull Player player) {
+        int healthToDisplay = (int) (player.getHealth());
+        int maxHealth = (int) player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+        double healthPercent = (double) healthToDisplay / maxHealth;
+        ChatColor chatColor;
+        if (healthPercent >= .75) {
+            chatColor = ChatColor.GREEN;
+        } else if (healthPercent >= .5) {
+            chatColor = ChatColor.YELLOW;
+        } else if (healthPercent >= .25) {
+            chatColor = ChatColor.RED;
+        } else {
+            chatColor = ChatColor.DARK_RED;
+        }
+        return chatColor;
+    }
+
+    /**
+     * A method that returns the color of the user's name
+     *
+     * @param player the user
+     * @return the color of the user's name
+     */
+    @NotNull
+    private static String getTablistNameColor(@NotNull Player player) {
+        User lpUser = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
+        String nameColor;
+        if (lpUser == null) {
+            nameColor = ChatColor.WHITE.toString();
+        } else {
+            String color = lpUser.getCachedData().getMetaData().getMetaValue("name_color");
+            nameColor = color != null ? ColorUtil.format(color) : ChatColor.WHITE.toString();
+        }
+        if (nameColor.equalsIgnoreCase(ChatColor.GRAY.toString())) nameColor = ChatColor.WHITE.toString();
+        return nameColor;
+    }
+
+    /**
+     * A method that returns the collection of players in sorted order
+     *
+     * @param players the players to be sorted
+     * @return the collection of players in sorted order
+     */
+    @NotNull
+    private static List<Pair<? extends Player, String>> sortPlayersByRank(@NotNull Collection<? extends Player> players) {
+        Map<Player, String> playerRankColors = new HashMap<>();
+        for (Player player : players) {
+            playerRankColors.put(player, getTablistNameColor(player));
+        }
+
+        List<? extends Player> playersList = new ArrayList<>(players);
+        playersList.sort((playerOne, playerTwo) -> {
+            int indexOne = RANK_COLOR_ORDER.indexOf(playerRankColors.get(playerOne));
+            int indexTwo = RANK_COLOR_ORDER.indexOf(playerRankColors.get(playerTwo));
+            if (indexOne == -1) indexOne = Integer.MAX_VALUE;
+            if (indexTwo == -1) indexTwo = Integer.MAX_VALUE;
+            return Integer.compare(indexOne, indexTwo);
+        });
+
+        List<Pair<? extends Player, String>> finalList = new ArrayList<>(players.size());
+        for (Player player : playersList) {
+            finalList.add(new Pair<>(player, playerRankColors.get(player) + player.getName()));
+        }
+
+        return finalList;
     }
 
     @Override
@@ -138,79 +212,5 @@ public final class RunicRealmsTabList extends TabList {
         }
 
         super.update();
-    }
-
-    /**
-     * A method that returns the color of the user's health in the tab display while in a party
-     *
-     * @param player the user to get health from
-     * @return the color of the user's health in the tab display while in a party
-     */
-    @NotNull
-    private static ChatColor getHealthChatColor(@NotNull Player player) {
-        int healthToDisplay = (int) (player.getHealth());
-        int maxHealth = (int) player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
-        double healthPercent = (double) healthToDisplay / maxHealth;
-        ChatColor chatColor;
-        if (healthPercent >= .75) {
-            chatColor = ChatColor.GREEN;
-        } else if (healthPercent >= .5) {
-            chatColor = ChatColor.YELLOW;
-        } else if (healthPercent >= .25) {
-            chatColor = ChatColor.RED;
-        } else {
-            chatColor = ChatColor.DARK_RED;
-        }
-        return chatColor;
-    }
-
-    /**
-     * A method that returns the color of the user's name
-     *
-     * @param player the user
-     * @return the color of the user's name
-     */
-    @NotNull
-    private static String getTablistNameColor(@NotNull Player player) {
-        User lpUser = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
-        String nameColor;
-        if (lpUser == null) {
-            nameColor = ChatColor.WHITE.toString();
-        } else {
-            String color = lpUser.getCachedData().getMetaData().getMetaValue("name_color");
-            nameColor = color != null ? ColorUtil.format(color) : ChatColor.WHITE.toString();
-        }
-        if (nameColor.equalsIgnoreCase(ChatColor.GRAY.toString())) nameColor = ChatColor.WHITE.toString();
-        return nameColor;
-    }
-
-    /**
-     * A method that returns the collection of players in sorted order
-     *
-     * @param players the players to be sorted
-     * @return the collection of players in sorted order
-     */
-    @NotNull
-    private static List<Pair<? extends Player, String>> sortPlayersByRank(@NotNull Collection<? extends Player> players) {
-        Map<Player, String> playerRankColors = new HashMap<>();
-        for (Player player : players) {
-            playerRankColors.put(player, getTablistNameColor(player));
-        }
-
-        List<? extends Player> playersList = new ArrayList<>(players);
-        playersList.sort((playerOne, playerTwo) -> {
-            int indexOne = RANK_COLOR_ORDER.indexOf(playerRankColors.get(playerOne));
-            int indexTwo = RANK_COLOR_ORDER.indexOf(playerRankColors.get(playerTwo));
-            if (indexOne == -1) indexOne = Integer.MAX_VALUE;
-            if (indexTwo == -1) indexTwo = Integer.MAX_VALUE;
-            return Integer.compare(indexOne, indexTwo);
-        });
-
-        List<Pair<? extends Player, String>> finalList = new ArrayList<>(players.size());
-        for (Player player : playersList) {
-            finalList.add(new Pair<>(player, playerRankColors.get(player) + player.getName()));
-        }
-
-        return finalList;
     }
 }
