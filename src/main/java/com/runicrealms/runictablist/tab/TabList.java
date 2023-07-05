@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -35,7 +34,7 @@ public class TabList {
     private String clientFooter;
 
     public static final int MAXIMUM_ITEMS = 4 * 20; //client maximum is 4x20 (4 columns, 20 rows)
-    private static final List<PlayerInfoData> BLANKS = IntStream.range(0, TabList.MAXIMUM_ITEMS).mapToObj(i -> TabList.build(TabElement.BLANK, i)).collect(Collectors.toUnmodifiableList());
+    private static final List<PlayerInfoData> BLANKS = IntStream.range(0, TabList.MAXIMUM_ITEMS).mapToObj(i -> TabList.build(TabElement.BLANK, i)).toList();
 
     public TabList(@NotNull Player player, @Nullable String header, @Nullable String footer) {
         this.player = player;
