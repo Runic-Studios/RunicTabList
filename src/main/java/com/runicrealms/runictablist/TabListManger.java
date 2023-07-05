@@ -135,12 +135,12 @@ public final class TabListManger implements Listener {
         this.partyUpdate(event.getParty());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR) //UNTESTED
     private void onGuildCreate(GuildCreationEvent event) {
         this.update(Bukkit.getPlayer(event.getUuid()));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR) //UNTESTED
     private void onGuildDisband(GuildDisbandEvent event) {
         this.guildUpdate(event.getUUID());
     }
@@ -148,6 +148,8 @@ public final class TabListManger implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildJoin(GuildInvitationAcceptedEvent event) {
         this.guildUpdate(event.getUUID());
+        this.update(Bukkit.getPlayer(event.getInvited()), 10);
+        //player is not added to guild until after event is called, therefore we have a 10 tick delay
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -158,7 +160,6 @@ public final class TabListManger implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildKick(GuildMemberKickedEvent event) {
         this.guildUpdate(RunicGuilds.getDataAPI().getGuildInfo(Bukkit.getPlayer(event.getKicker())).getUUID());
-        this.update(Bukkit.getPlayer(event.getKicked()));
     }
 
     /**

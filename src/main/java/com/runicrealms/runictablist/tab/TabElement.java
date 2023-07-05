@@ -221,7 +221,7 @@ public class TabElement {
         public static Skin fromProfile(@NotNull WrappedGameProfile profile) {
             Optional<WrappedSignedProperty> textures = profile.getProperties().get("textures").stream().findAny();
 
-            if (!textures.isPresent()) {
+            if (textures.isEmpty()) {
                 return null;
             }
 
