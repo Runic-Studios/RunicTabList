@@ -176,15 +176,19 @@ public final class RunicRealmsTabList extends TabList {
     @NotNull
     private static String getTablistNameColor(@NotNull Player player) {
         User lpUser = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
+
         String nameColor;
-        if (lpUser == null) {
-            nameColor = ChatColor.WHITE.toString();
-        } else {
+        if (lpUser != null) {
             String color = lpUser.getCachedData().getMetaData().getMetaValue("name_color");
             nameColor = color != null ? ColorUtil.format(color) : ChatColor.WHITE.toString();
+        } else {
+            nameColor = ChatColor.WHITE.toString();
         }
-        if (nameColor.equalsIgnoreCase(ChatColor.GRAY.toString())) nameColor = ChatColor.WHITE.toString();
-        Bukkit.broadcastMessage(nameColor);
+
+        if (nameColor.equalsIgnoreCase(ChatColor.GRAY.toString())) {
+            nameColor = ChatColor.WHITE.toString();
+        }
+
         return nameColor;
     }
 
@@ -207,7 +211,10 @@ public final class RunicRealmsTabList extends TabList {
             int indexTwo = RANK_COLOR_ORDER.indexOf(playerRankColors.get(playerTwo));
             if (indexOne == -1) indexOne = Integer.MAX_VALUE;
             if (indexTwo == -1) indexTwo = Integer.MAX_VALUE;
-            return Integer.compare(indexOne, indexTwo);
+
+            int compare = Integer.compare(indexOne, indexTwo);
+
+            return compare != 0 ? compare : playerOne.getName().compareTo(playerTwo.getName());
         });
 
         List<Pair<? extends Player, String>> finalList = new ArrayList<>(players.size());
