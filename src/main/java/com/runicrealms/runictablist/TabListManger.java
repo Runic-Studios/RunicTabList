@@ -56,16 +56,6 @@ public final class TabListManger implements Listener {
         this.tabLists.put(player.getUniqueId(), tabList);
 
         this.update(player, 0);
-
-        /*
-        try {
-            this.update(player, 0);
-        } catch (NullPointerException e) {
-            //a known bug where spigot throws a null pointer when the server starts up too early, does not impact behavior
-            //RunicTabList.getInstance().getLogger().log(Level.INFO, "-" + e.getMessage() + "-");
-            e.printStackTrace();
-        }
-         */
     }
 
     /**

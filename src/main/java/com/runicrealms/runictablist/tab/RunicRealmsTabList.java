@@ -47,8 +47,8 @@ public final class RunicRealmsTabList extends TabList {
             ChatColor.WHITE.toString(),
             ChatColor.GRAY.toString()
     );
-    private static final TabElement EMPTY_PARTY = new TabElement("&a&l Party [0]", TabElement.Ping.PERFECT, TabElement.Skin.GREEN);
-    private static final TabElement EMPTY_GUILD = new TabElement("&6&l Guild [0]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD);
+    private static final TabElement EMPTY_PARTY = new TabElement("&a&l  Party [0]", TabElement.Ping.PERFECT, TabElement.Skin.GREEN);
+    private static final TabElement EMPTY_GUILD = new TabElement("&6&l  Guild [0]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD);
 
     public RunicRealmsTabList(@NotNull Player player) {
         super(player, "&d&lRunic Realms\n"
@@ -91,7 +91,7 @@ public final class RunicRealmsTabList extends TabList {
 
         Party party = RunicCore.getPartyAPI().getParty(this.getPlayer().getUniqueId());
         if (party != null) {
-            this.set(new TabElement("&a&l Party [" + party.getSize() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GREEN), 2, 0);
+            this.set(new TabElement("&a&l  Party [" + party.getSize() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GREEN), 2, 0);
 
             List<Pair<? extends Player, String>> sortedParty = sortPlayersByRank(party.getMembersWithLeader());
             for (int i = 0; i < 20; i++) {
@@ -128,7 +128,7 @@ public final class RunicRealmsTabList extends TabList {
                 .filter(player -> this.getPlayer().hasPermission("runiccore.vanish") || !RunicCore.getVanishAPI().getVanishedPlayers().contains(player))
                 .collect(Collectors.toSet());
 
-        this.set(new TabElement("&6&l Guild [" + onlineMembers.size() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD), 3, 0);
+        this.set(new TabElement("&6&l  Guild [" + onlineMembers.size() + "]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD), 3, 0);
 
         List<Pair<? extends Player, String>> guildMembers = sortPlayersByRank(onlineMembers);
         for (int i = 0; i < 20; i++) {
