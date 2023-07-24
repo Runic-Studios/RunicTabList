@@ -7,6 +7,7 @@ import com.runicrealms.plugin.party.event.PartyEvent;
 import com.runicrealms.plugin.party.event.PartyJoinEvent;
 import com.runicrealms.plugin.party.event.PartyLeaveEvent;
 import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
+import com.runicrealms.plugin.rdb.event.CharacterSelectEvent;
 import com.runicrealms.runicguilds.RunicGuilds;
 import com.runicrealms.runicguilds.api.event.GuildCreationEvent;
 import com.runicrealms.runicguilds.api.event.GuildDisbandEvent;
@@ -29,6 +30,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * A class that keeps track of the tablist open for all players online
+ *
+ * @author BoBoBalloon
+ */
 public final class TabListManger implements Listener {
     private final Map<UUID, RunicRealmsTabList> tabLists;
 
@@ -37,16 +43,29 @@ public final class TabListManger implements Listener {
     }
 
     /**
-     * A method used to add a player to the tab list
+     * A method used to add a player to the tab list and to send the necessary update packets
      *
      * @param player the user to add to the cache
      */
     public void addUser(@NotNull Player player) {
-        if (!this.tabLists.containsKey(player.getUniqueId())) {
-            RunicRealmsTabList tabList = new RunicRealmsTabList(player);
-            this.tabLists.put(player.getUniqueId(), tabList);
-            RunicCore.getInstance().getServer().getScheduler().runTaskLaterAsynchronously(RunicTabList.getInstance(), tabList::update, 1);
+        if (this.tabLists.containsKey(player.getUniqueId())) {
+            return;
         }
+
+        RunicRealmsTabList tabList = new RunicRealmsTabList(player);
+        this.tabLists.put(player.getUniqueId(), tabList);
+
+        this.update(player, 0);
+
+        /*
+        try {
+            this.update(player, 0);
+        } catch (NullPointerException e) {
+            //a known bug where spigot throws a null pointer when the server starts up too early, does not impact behavior
+            //RunicTabList.getInstance().getLogger().log(Level.INFO, "-" + e.getMessage() + "-");
+            e.printStackTrace();
+        }
+         */
     }
 
     /**
@@ -102,9 +121,13 @@ public final class TabListManger implements Listener {
         }, 1);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    private void onPlayerJoin(CharacterLoadedEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST) //I just want to fire this code first
+    private void onCharacterSelect(CharacterSelectEvent event) {
         this.addUser(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onCharacterLoaded(CharacterLoadedEvent event) {
         refreshAllTabLists();
     }
 
@@ -166,21 +189,11 @@ public final class TabListManger implements Listener {
      * A method used to update the tablists of all party members
      *
      * @param party the party to be updated
-     * @param delay the delay in ticks before the update packets are sent
-     */
-    private void partyUpdate(@NotNull Party party, long delay) {
-        for (Player player : party.getMembersWithLeader()) {
-            this.update(player, delay);
-        }
-    }
-
-    /**
-     * A method used to update the tablists of all party members
-     *
-     * @param party the party to be updated
      */
     private void partyUpdate(@NotNull Party party) {
-        this.partyUpdate(party, 1);
+        for (Player player : party.getMembersWithLeader()) {
+            this.update(player);
+        }
     }
 
     /**

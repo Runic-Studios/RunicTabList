@@ -23,6 +23,8 @@ import java.util.stream.IntStream;
 
 /**
  * A class that represents a tab list sent to a player
+ *
+ * @author BoBoBalloon
  */
 public class TabList {
     private final Player player;
@@ -44,6 +46,10 @@ public class TabList {
         this.footer = footer != null ? ColorUtil.format(footer) : null;
         this.clientHeader = null;
         this.clientFooter = null;
+    }
+
+    public TabList(@NotNull Player player) {
+        this(player, null, null);
     }
 
     /**

@@ -29,6 +29,8 @@ import java.util.stream.IntStream;
 
 /**
  * A tab list for a user on runic realms
+ *
+ * @author BoBoBalloon
  */
 public final class RunicRealmsTabList extends TabList {
     private static final List<String> RANK_COLOR_ORDER = List.of(
@@ -50,7 +52,7 @@ public final class RunicRealmsTabList extends TabList {
 
     public RunicRealmsTabList(@NotNull Player player) {
         super(player, "&d&lRunic Realms\n"
-                        + "&r&b&lPatch 2.1.0 - PLACEHOLDER",
+                        + "&r&b&lPatch 2.0.6 - PLACEHOLDER",
                 "&2Our Website: &awww.runicrealms.com\n"
                         + "&5Our Discord: &5discord.gg/5FjVVd4");
     }

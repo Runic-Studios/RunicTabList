@@ -17,7 +17,9 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * A utility function to manage packets
+ * A utility lib to manage packets
+ *
+ * @author BoBoBalloon
  */
 public final class PacketUtil {
     private static final EnumSet<EnumWrappers.PlayerInfoAction> ACTIONS = EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER,

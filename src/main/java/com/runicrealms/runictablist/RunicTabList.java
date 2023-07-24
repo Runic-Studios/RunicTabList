@@ -8,8 +8,6 @@ public final class RunicTabList extends JavaPlugin {
     private static RunicTabList plugin;
     private TabListManger tabListManger;
 
-    //KNOWN BUG: skin for first loaded icon does not update if the update() method is called on another thread with delay, keep everything inside one thread (one task)
-
     /*
     TODO:
 
