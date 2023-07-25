@@ -148,14 +148,14 @@ public final class TabListManger implements Listener {
         this.partyUpdate(event.getParty());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR) //UNTESTED
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildCreate(GuildCreationEvent event) {
         this.update(Bukkit.getPlayer(event.getUuid()));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR) //UNTESTED
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildDisband(GuildDisbandEvent event) {
-        this.guildUpdate(event.getUUID());
+        this.guildUpdate(event.getUUID(), 10);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -190,13 +190,23 @@ public final class TabListManger implements Listener {
      * A method used to update the tablists of all guild members
      *
      * @param guildUUID the uuid of the guild
+     * @param delay     the delay before the update packets are sent
      */
-    private void guildUpdate(@NotNull UUID guildUUID) {
+    private void guildUpdate(@NotNull UUID guildUUID, long delay) {
         GuildInfo guild = RunicGuilds.getDataAPI().getGuildInfo(guildUUID);
 
         guild.getMembersUuids().stream()
                 .map(Bukkit::getPlayer)
                 .filter(Objects::nonNull)
-                .forEach(this::update);
+                .forEach(player -> this.update(player, delay));
+    }
+
+    /**
+     * A method used to update the tablists of all guild members
+     *
+     * @param guildUUID the uuid of the guild
+     */
+    private void guildUpdate(@NotNull UUID guildUUID) {
+        this.guildUpdate(guildUUID, 1);
     }
 }
