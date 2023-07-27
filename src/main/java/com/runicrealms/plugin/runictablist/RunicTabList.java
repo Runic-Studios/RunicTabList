@@ -1,4 +1,4 @@
-package com.runicrealms.runictablist;
+package com.runicrealms.plugin.runictablist;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;

@@ -1,4 +1,4 @@
-package com.runicrealms.runictablist.tab;
+package com.runicrealms.plugin.runictablist.tab;
 
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
@@ -7,7 +7,7 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import com.runicrealms.plugin.common.util.ColorUtil;
-import com.runicrealms.runictablist.util.PacketUtil;
+import com.runicrealms.plugin.runictablist.util.PacketUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

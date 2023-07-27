@@ -1,12 +1,12 @@
-package com.runicrealms.runictablist.tab;
+package com.runicrealms.plugin.runictablist.tab;
 
 import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.common.util.ColorUtil;
 import com.runicrealms.plugin.common.util.Pair;
 import com.runicrealms.plugin.party.Party;
 import com.runicrealms.plugin.rdb.RunicDatabase;
-import com.runicrealms.runicguilds.RunicGuilds;
-import com.runicrealms.runicguilds.model.GuildInfo;
+import com.runicrealms.plugin.runicguilds.RunicGuilds;
+import com.runicrealms.plugin.runicguilds.model.GuildInfo;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;

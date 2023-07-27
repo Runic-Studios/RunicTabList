@@ -1,4 +1,4 @@
-package com.runicrealms.runictablist;
+package com.runicrealms.plugin.runictablist;
 
 import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.api.event.PlayerVanishEvent;
@@ -8,14 +8,14 @@ import com.runicrealms.plugin.party.event.PartyJoinEvent;
 import com.runicrealms.plugin.party.event.PartyLeaveEvent;
 import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
 import com.runicrealms.plugin.rdb.event.CharacterSelectEvent;
-import com.runicrealms.runicguilds.RunicGuilds;
-import com.runicrealms.runicguilds.api.event.GuildCreationEvent;
-import com.runicrealms.runicguilds.api.event.GuildDisbandEvent;
-import com.runicrealms.runicguilds.api.event.GuildInvitationAcceptedEvent;
-import com.runicrealms.runicguilds.api.event.GuildMemberKickedEvent;
-import com.runicrealms.runicguilds.api.event.GuildMemberLeaveEvent;
-import com.runicrealms.runicguilds.model.GuildInfo;
-import com.runicrealms.runictablist.tab.RunicRealmsTabList;
+import com.runicrealms.plugin.runicguilds.RunicGuilds;
+import com.runicrealms.plugin.runicguilds.api.event.GuildCreationEvent;
+import com.runicrealms.plugin.runicguilds.api.event.GuildDisbandEvent;
+import com.runicrealms.plugin.runicguilds.api.event.GuildInvitationAcceptedEvent;
+import com.runicrealms.plugin.runicguilds.api.event.GuildMemberKickedEvent;
+import com.runicrealms.plugin.runicguilds.api.event.GuildMemberLeaveEvent;
+import com.runicrealms.plugin.runicguilds.model.GuildInfo;
+import com.runicrealms.plugin.runictablist.tab.RunicRealmsTabList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

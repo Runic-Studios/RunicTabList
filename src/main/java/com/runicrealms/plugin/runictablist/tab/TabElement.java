@@ -1,4 +1,4 @@
-package com.runicrealms.runictablist.tab;
+package com.runicrealms.plugin.runictablist.tab;
 
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
