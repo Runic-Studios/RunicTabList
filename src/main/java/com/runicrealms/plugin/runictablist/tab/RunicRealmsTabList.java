@@ -51,8 +51,8 @@ public final class RunicRealmsTabList extends TabList {
     private static final TabElement EMPTY_GUILD = new TabElement("&6&l  Guild [0]", TabElement.Ping.PERFECT, TabElement.Skin.GOLD);
 
     public RunicRealmsTabList(@NotNull Player player) {
-        super(player, "&d&lRunic Realms\n"
-                        + "&r" + RunicCore.VERSION_TITLE,
+        super(player, "&r" + "&d&lRunic Realms - &r" + RunicCore.VERSION_NUMBER + "\n&r" +
+                        RunicCore.VERSION_TITLE,
                 "&2Our Website: &awww.runicrealms.com\n"
                         + "&5Our Discord: &5discord.gg/5FjVVd4");
     }
