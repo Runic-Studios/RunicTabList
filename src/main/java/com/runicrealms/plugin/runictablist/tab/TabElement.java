@@ -1,8 +1,8 @@
-package com.runicrealms.runictablist.tab;
+package com.runicrealms.plugin.runictablist.tab;
 
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
-import com.runicrealms.runictablist.util.TextUtil;
+import com.runicrealms.plugin.common.util.ColorUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ public class TabElement {
     public static final TabElement BLANK = new TabElement("", Ping.VERY_BAD, Skin.BLANK);
 
     public TabElement(@NotNull String text, @NotNull Ping ping, @Nullable Skin skin) {
-        this.text = TextUtil.format(text);
+        this.text = ColorUtil.format(text);
         this.ping = ping;
         this.skin = skin;
     }
@@ -43,7 +43,7 @@ public class TabElement {
      * @param text the text that will be displayed in this element
      */
     public void setText(@NotNull String text) {
-        this.text = TextUtil.format(text);
+        this.text = ColorUtil.format(text);
     }
 
     /**
@@ -221,7 +221,7 @@ public class TabElement {
         public static Skin fromProfile(@NotNull WrappedGameProfile profile) {
             Optional<WrappedSignedProperty> textures = profile.getProperties().get("textures").stream().findAny();
 
-            if (!textures.isPresent()) {
+            if (textures.isEmpty()) {
                 return null;
             }
 

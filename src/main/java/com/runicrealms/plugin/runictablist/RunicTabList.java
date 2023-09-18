@@ -1,20 +1,24 @@
-package com.runicrealms.runictablist;
+package com.runicrealms.plugin.runictablist;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 public final class RunicTabList extends JavaPlugin {
     private static RunicTabList plugin;
-
-    //KNOWN BUG: skin for first loaded icon does not update if the update() method is called on another thread with delay, keep everything inside one thread (one task)
+    private TabListManger tabListManger;
 
     /*
     TODO:
+
      */
 
     @Override
     public void onEnable() {
         RunicTabList.plugin = this;
+        this.tabListManger = new TabListManger();
+
+        Bukkit.getPluginManager().registerEvents(this.tabListManger, this);
     }
 
     @Override
@@ -34,5 +38,15 @@ public final class RunicTabList extends JavaPlugin {
         }
 
         return RunicTabList.plugin;
+    }
+
+    /**
+     * A method that returns the instance of the tab list manager
+     *
+     * @return the instance of the tab list manager
+     */
+    @NotNull
+    public TabListManger getTabListManger() {
+        return this.tabListManger;
     }
 }

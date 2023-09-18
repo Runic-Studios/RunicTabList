@@ -1,4 +1,4 @@
-package com.runicrealms.runictablist.util;
+package com.runicrealms.plugin.runictablist.util;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -6,7 +6,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.runicrealms.runictablist.tab.TabElement;
+import com.runicrealms.plugin.runictablist.tab.TabElement;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,13 +17,18 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * A utility function to manage packets
+ * A utility lib to manage packets
+ *
+ * @author BoBoBalloon
  */
 public final class PacketUtil {
     private static final EnumSet<EnumWrappers.PlayerInfoAction> ACTIONS = EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER,
             EnumWrappers.PlayerInfoAction.UPDATE_LISTED,
             EnumWrappers.PlayerInfoAction.UPDATE_LATENCY,
             EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME);
+
+
+    //private static final EnumSet<EnumWrappers.PlayerInfoAction> ACTIONS = EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER, EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME, EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE, EnumWrappers.PlayerInfoAction.UPDATE_LATENCY, EnumWrappers.PlayerInfoAction.UPDATE_LISTED);
 
     /**
      * Private constructor to prevent class being used in an OOP way
