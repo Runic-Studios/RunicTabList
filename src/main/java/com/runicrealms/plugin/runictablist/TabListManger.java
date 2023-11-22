@@ -2,6 +2,12 @@ package com.runicrealms.plugin.runictablist;
 
 import com.runicrealms.plugin.RunicCore;
 import com.runicrealms.plugin.api.event.PlayerVanishEvent;
+import com.runicrealms.plugin.events.EnvironmentDamageEvent;
+import com.runicrealms.plugin.events.HealthRegenEvent;
+import com.runicrealms.plugin.events.MagicDamageEvent;
+import com.runicrealms.plugin.events.PhysicalDamageEvent;
+import com.runicrealms.plugin.events.RangedDamageEvent;
+import com.runicrealms.plugin.events.RunicDamageEvent;
 import com.runicrealms.plugin.party.Party;
 import com.runicrealms.plugin.party.event.PartyEvent;
 import com.runicrealms.plugin.party.event.PartyJoinEvent;
@@ -173,6 +179,54 @@ public final class TabListManger implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onGuildKick(GuildMemberKickedEvent event) {
         this.guildUpdate(RunicGuilds.getDataAPI().getGuildInfo(Bukkit.getPlayer(event.getKicker())).getUUID());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onEnvironmentDamage(EnvironmentDamageEvent event) {
+        this.onDamage(event);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onMagicDamage(MagicDamageEvent event) {
+        this.onDamage(event);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onPhysicalDamage(PhysicalDamageEvent event) {
+        this.onDamage(event);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onRangedDamage(RangedDamageEvent event) {
+        this.onDamage(event);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void onRunicHeal(HealthRegenEvent event) {
+        this.partyUpdate(event.getPlayer());
+    }
+
+    private void onDamage(@NotNull RunicDamageEvent event) {
+        if (!(event.getVictim() instanceof Player player)) {
+            return;
+        }
+
+        this.partyUpdate(player);
+    }
+
+    /**
+     * A method used to update the tablist for all players in the player's party if they are in one
+     *
+     * @param player the player
+     */
+    private void partyUpdate(@NotNull Player player) {
+        Party party = RunicCore.getPartyAPI().getParty(player.getUniqueId());
+
+        if (party == null) {
+            return;
+        }
+
+        this.partyUpdate(party);
     }
 
     /**
