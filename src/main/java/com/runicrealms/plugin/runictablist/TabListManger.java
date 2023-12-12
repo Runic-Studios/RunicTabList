@@ -146,12 +146,13 @@ public final class TabListManger implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     private void onPartyJoin(PartyJoinEvent event) {
         this.partyUpdate(event.getParty());
-        this.update(event.getMember());
+        this.update(event.getJoining());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void onPartyLeave(PartyLeaveEvent event) {
         this.partyUpdate(event.getParty());
+        this.partyUpdate(event.getLeaver());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
