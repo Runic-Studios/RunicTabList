@@ -14,11 +14,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
 /**
@@ -30,18 +30,18 @@ public class TabList {
     private final Player player;
     private final Map<Integer, TabElement> elements;
     private final Map<Integer, TabElement> clientElements;
-    private String header;
-    private String footer;
-    private String clientHeader;
-    private String clientFooter;
+    private volatile String header;
+    private volatile String footer;
+    private volatile String clientHeader;
+    private volatile String clientFooter;
 
     public static final int MAXIMUM_ITEMS = 4 * 20; //client maximum is 4x20 (4 columns, 20 rows)
     private static final List<PlayerInfoData> BLANKS = IntStream.range(0, TabList.MAXIMUM_ITEMS).mapToObj(i -> TabList.build(TabElement.BLANK, i)).toList();
 
     public TabList(@NotNull Player player, @Nullable String header, @Nullable String footer) {
         this.player = player;
-        this.elements = new HashMap<>();
-        this.clientElements = new HashMap<>();
+        this.elements = new ConcurrentHashMap<>();
+        this.clientElements = new ConcurrentHashMap<>();
         this.header = header != null ? ColorUtil.format(header) : null;
         this.footer = footer != null ? ColorUtil.format(footer) : null;
         this.clientHeader = null;
